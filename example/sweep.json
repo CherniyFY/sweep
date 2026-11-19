@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "roots_allowlist": ["${HOME}"],
+  "exec_allowlist": ["docker"],
+  "rules": [
+    {
+      "name": "go build cache",
+      "kind": "purge",
+      "path": "${HOME}/.cache/go-build"
+    },
+    {
+      "name": "trivy db cache",
+      "kind": "purge",
+      "path": "${HOME}/.cache/trivy"
+    },
+    {
+      "name": "session snapshots",
+      "kind": "prune",
+      "path": "${HOME}/sweep-backups",
+      "grace_hours": 24,
+      "bucket_days": [2, 4, 8, 16, 32],
+      "keep_per_bucket": [2, 1, 1, 1, 1, 1],
+      "always_keep": 2,
+      "protected": ["*.lock", "*-preflight*"]
+    },
+    {
+      "name": "docker images",
+      "kind": "exec",
+      "command": ["docker", "image", "prune", "-a", "-f"]
+    },
+    {
+      "name": "docker build cache",
+      "kind": "exec",
+      "command": ["docker", "builder", "prune", "-af"]
+    }
+  ]
+}
